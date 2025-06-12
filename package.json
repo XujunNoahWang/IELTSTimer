@@ -1,0 +1,41 @@
+{
+  "name": "noahs-ielts-timer",
+  "version": "1.0.0",
+  "description": "A comprehensive timer application for IELTS practice with mobile optimization and audio notifications",
+  "main": "public/index.html",
+  "scripts": {
+    "start": "python -m http.server 8000 --directory public",
+    "dev": "python -m http.server 8000 --directory public",
+    "build": "echo 'No build process needed for static files'",
+    "test": "echo 'No tests specified'",
+    "lint:css": "echo 'CSS linting not configured'",
+    "lint:js": "echo 'JavaScript linting not configured'"
+  },
+  "keywords": [
+    "ielts",
+    "timer",
+    "education",
+    "practice",
+    "mobile",
+    "responsive",
+    "audio",
+    "notifications"
+  ],
+  "author": "Noah Wang",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/XujunNoahWang/IELTSTimer.git"
+  },
+  "homepage": "https://noahs-ielts-timer.vercel.app/",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "iOS >= 10",
+    "Android >= 5"
+  ]
+} 

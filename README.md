@@ -1,117 +1,185 @@
 # Noah's IELTS Timer
 
-A lightweight, elegant timer application designed specifically for IELTS practice sessions. Features a beautiful circular progress indicator, day/night mode toggle, and audio notifications.
+A comprehensive, mobile-optimized timer application specifically designed for IELTS practice sessions. Features include customizable timers for all four IELTS skills, audio notifications, and a beautiful responsive interface.
 
-## Features
+## 🌟 Features
 
-### 📚 Reading Practice
-- **60 min** - Full exam duration
-- **20 min** - Single passage practice
-- **18 min** - Quick practice
-- **16 min** - Challenge practice
-- **Custom time** (up to 60 minutes)
+### Core Functionality
+- **Multi-skill Support**: Dedicated timers for Reading, Writing, Speaking, and Break sessions
+- **Preset Timers**: Quick-start buttons for common IELTS practice durations
+- **Custom Timers**: Set any duration within reasonable limits
+- **Visual Progress**: Beautiful circular progress indicator with color transitions
+- **Audio Notifications**: Sound alerts for timer completion and warnings
 
-### ✍️ Writing Practice
-- **60 min** - Full exam duration
-- **40 min** - Task 2 practice
-- **20 min** - Task 1 practice
-- **15 min** - Quick practice
-- **Custom time** (up to 60 minutes)
+### Mobile Optimization
+- **Responsive Design**: Optimized for both desktop and mobile devices
+- **Touch-friendly Interface**: Large buttons and intuitive gestures
+- **Mobile Menu**: Slide-out control panel for mobile devices
+- **Zoom Prevention**: Prevents unwanted zooming on mobile input fields
+- **Cross-browser Compatibility**: Works on iOS Safari, Android Chrome, and WeChat browser
 
-### 🎤 Speaking Practice
-- **2 min** - Part 2 dedicated timer
+### User Experience
+- **Click Controls**: Click timer circle to pause/resume, double-click to stop
+- **Keyboard Shortcuts**: Space to pause/resume, ESC to close modals
+- **Day/Night Mode**: Toggle between light and dark themes
+- **Sound Settings Guide**: Helpful instructions for audio setup
+- **Completion Celebrations**: Animated completion notifications
 
-### ☕ Break Timer
-- **2, 5, 10, 15, 20, 30 minutes** - Preset break durations
-- **Custom time** - Any duration for breaks
+## 🚀 Live Demo
 
-## Interface Features
+Visit the live application: [https://noahs-ielts-timer.vercel.app/](https://noahs-ielts-timer.vercel.app/)
 
-### 🎨 Visual Design
-- **Circular Progress Indicator** - Dynamic color-changing ring that transitions from teal to orange to red as time progresses
-- **Glass Morphism Design** - Modern frosted glass effect for control panels
-- **Responsive Layout** - Works perfectly on desktop and mobile devices
-- **Day/Night Mode** - Toggle between light and dark themes
-
-### 🔊 Audio Notifications
-- Start/pause/resume sound effects
-- Final 10-second countdown alerts
-- Completion celebration sounds
-
-### ⌨️ Keyboard Controls
-- **Space Bar** - Pause/resume timer (only when timer is running)
-- **Escape** - Close completion modal
-
-### 🖱️ Mouse Controls
-- **Click Circle** - Pause/resume timer
-- **Click Buttons** - Start new timers (automatically resets current timer)
-
-## How to Use
-
-1. **Open the Application** - Simply open `index.html` in any modern web browser
-2. **Select Practice Type** - Choose from Reading, Writing, Speaking, or Break
-3. **Choose Duration** - Click preset buttons or enter custom time
-4. **Start Timer** - Timer begins immediately with audio confirmation
-5. **Control Timer** - Click the circle or press Space to pause/resume
-6. **Toggle Theme** - Click sun/moon icon in top-right to switch day/night mode
-
-## Technical Details
-
-- **Single File Application** - Everything contained in one HTML file for easy portability
-- **No Dependencies** - Uses only CDN resources (Tailwind CSS, Font Awesome)
-- **Modern Browser Support** - Works with Chrome, Firefox, Safari, Edge
-- **Lightweight** - Fast loading and minimal resource usage
-- **Offline Ready** - Once loaded, works without internet (except for CDN resources)
-
-## File Structure
+## 📁 Project Structure
 
 ```
-index.html    # Complete application (HTML + CSS + JavaScript)
-README.md               # This documentation
+IELTSTimer/
+├── public/
+│   └── index.html          # Main HTML file
+├── src/
+│   ├── css/
+│   │   └── styles.css      # Custom CSS styles
+│   └── js/
+│       └── timer.js        # JavaScript functionality
+├── assets/
+│   └── audio/              # Audio files (if any)
+├── package.json            # Project configuration
+├── README.md              # Project documentation
+└── index.html             # Legacy single-file version
 ```
 
-## Browser Compatibility
+## 🛠️ Technology Stack
 
-- ✅ Chrome 60+
-- ✅ Firefox 55+
-- ✅ Safari 11+
-- ✅ Edge 79+
+- **HTML5**: Semantic markup and modern web standards
+- **CSS3**: Custom styles with Flexbox and Grid layouts
+- **JavaScript (ES6+)**: Modern JavaScript with modules and classes
+- **Tailwind CSS**: Utility-first CSS framework
+- **Font Awesome**: Icon library
+- **Web Audio API**: For cross-platform audio notifications
 
-## Installation
+## 🏃‍♂️ Getting Started
 
-No installation required! Simply:
+### Prerequisites
+- Python 3.x (for local development server)
+- Modern web browser (Chrome, Firefox, Safari, Edge)
 
-1. Download `index.html`
-2. Open it in your web browser
-3. Start practicing!
+### Installation
 
-## Features in Detail
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/XujunNoahWang/IELTSTimer.git
+   cd IELTSTimer
+   ```
 
-### Timer Behavior
-- **Automatic Reset** - Starting a new timer automatically resets the current one
-- **Pause/Resume** - Click the circle or press Space to control timing
-- **Visual Feedback** - "Click to Pause" / "Click to Resume" text appears in circle center
-- **Progress Tracking** - Real-time elapsed and remaining time display
+2. **Start the development server**
+   ```bash
+   npm start
+   # or
+   python -m http.server 8000 --directory public
+   ```
 
-### Color System
-- **Teal** - Fresh start, plenty of time remaining
-- **Orange** - Midway point, time to focus
-- **Red** - Final stretch, urgency mode
+3. **Open in browser**
+   Navigate to `http://localhost:8000`
 
-### Audio System
-- **Start Sound** - Confirmation beep when timer begins
-- **Pause/Resume** - Different tones for pause and resume actions
-- **Final Countdown** - Alert sounds in the last 10 seconds
-- **Completion** - Celebratory three-tone sequence
+### Alternative Setup
+For a simple setup without a server, you can open `public/index.html` directly in your browser, though some features may require a server environment.
 
-## License
+## 📱 Usage Guide
 
-This project is open source and available under the MIT License.
+### Desktop Usage
+1. Select a timer category (Reading, Writing, Speaking, Break)
+2. Click a preset time or enter a custom duration
+3. Click the circular timer to pause/resume
+4. Use keyboard shortcuts for quick control
 
-## Author
+### Mobile Usage
+1. Tap the hamburger menu (☰) to open the control panel
+2. Select your desired timer
+3. The panel will automatically close when a timer starts
+4. Tap the timer circle to pause/resume
 
-Created by Xujun (Noah) Wang for IELTS practitioners worldwide. 🌍
+### Timer Controls
+- **Start**: Click any timer button
+- **Pause/Resume**: Click the timer circle or press Space
+- **Stop**: Double-click the timer circle or press ESC
+- **Sound Settings**: Click the orange notification button (!)
+
+## 🎨 Customization
+
+### Modifying Timer Presets
+Edit the timer buttons in `public/index.html`:
+```html
+<button onclick="startTimer(25, 'Reading')">25 min</button>
+```
+
+### Styling Changes
+Modify `src/css/styles.css` to customize:
+- Colors and themes
+- Layout and spacing
+- Animations and transitions
+- Mobile responsiveness
+
+### Adding Features
+Extend functionality in `src/js/timer.js`:
+- New timer types
+- Additional audio notifications
+- Enhanced mobile features
+- Data persistence
+
+## 🔧 Development
+
+### Code Structure
+- **Modular Design**: Separated HTML, CSS, and JavaScript
+- **Clean Architecture**: Well-organized functions and modules
+- **Responsive First**: Mobile-first design approach
+- **Cross-browser**: Tested on major browsers and platforms
+
+### Best Practices
+- Semantic HTML markup
+- CSS custom properties for theming
+- Modern JavaScript features
+- Accessibility considerations
+- Performance optimization
+
+## 📊 Browser Support
+
+| Browser | Version | Status |
+|---------|---------|--------|
+| Chrome | 70+ | ✅ Full Support |
+| Firefox | 65+ | ✅ Full Support |
+| Safari | 12+ | ✅ Full Support |
+| Edge | 79+ | ✅ Full Support |
+| iOS Safari | 10+ | ✅ Full Support |
+| Android Chrome | 70+ | ✅ Full Support |
+| WeChat Browser | Latest | ✅ Full Support |
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+### Development Guidelines
+1. Follow the existing code style
+2. Test on multiple devices and browsers
+3. Update documentation as needed
+4. Ensure mobile compatibility
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Tailwind CSS for the utility-first CSS framework
+- Font Awesome for the beautiful icons
+- The IELTS community for inspiration and feedback
+- Vercel for hosting the live demo
+
+## 📞 Support
+
+If you encounter any issues or have questions:
+1. Check the [Issues](https://github.com/XujunNoahWang/IELTSTimer/issues) page
+2. Create a new issue if your problem isn't already reported
+3. Provide detailed information about your browser and device
 
 ---
 
-*Happy practicing! 📚✨* 
+**Happy IELTS practicing! 🎯** 

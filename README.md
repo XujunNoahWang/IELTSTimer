@@ -33,14 +33,20 @@ Visit the live application: [https://noahs-ielts-timer.vercel.app/](https://noah
 
 ```
 IELTSTimer/
+├── public/
+│   ├── src/
+│   │   ├── css/
+│   │   │   └── styles.css  # Custom CSS styles
+│   │   └── js/
+│   │       └── timer.js    # JavaScript functionality
+│   └── index.html          # Main HTML file (for deployment)
 ├── src/
 │   ├── css/
-│   │   └── styles.css      # Custom CSS styles
+│   │   └── styles.css      # Source CSS styles
 │   └── js/
-│       └── timer.js        # JavaScript functionality
+│       └── timer.js        # Source JavaScript functionality
 ├── archive/
 │   └── index-legacy.html   # Original single-file version
-├── index.html              # Main HTML file
 ├── package.json            # Project configuration
 ├── .gitignore              # Git ignore rules
 └── README.md              # Project documentation
@@ -80,7 +86,7 @@ IELTSTimer/
    Navigate to `http://localhost:8000`
 
 ### Alternative Setup
-For a simple setup without a server, you can open `index.html` directly in your browser, though some features may require a server environment.
+For a simple setup without a server, you can open `public/index.html` directly in your browser, though some features may require a server environment.
 
 ## 📱 Usage Guide
 
@@ -105,7 +111,7 @@ For a simple setup without a server, you can open `index.html` directly in your 
 ## 🎨 Customization
 
 ### Modifying Timer Presets
-Edit the timer buttons in `index.html`:
+Edit the timer buttons in `public/index.html`:
 ```html
 <button onclick="startTimer(25, 'Reading')">25 min</button>
 ```

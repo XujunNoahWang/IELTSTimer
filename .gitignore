@@ -132,4 +132,7 @@ Thumbs.db
 # Backup files
 *.bak
 *.backup
-*.old 
+*.old
+
+# Root index.html (use public/index.html for deployment)
+/index.html 

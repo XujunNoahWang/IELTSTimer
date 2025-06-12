@@ -352,8 +352,8 @@
         <div class="flex-1 flex flex-col items-center justify-center timer-container relative">
             <!-- Day/Night Mode Toggle -->
             <div class="absolute top-4 right-4 flex gap-2">
-                <button id="soundNotice" class="w-12 h-12 rounded-full bg-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-xl" onclick="showSoundNotice()" title="Sound Notice">
-                    <i class="fas fa-volume-up text-orange-500"></i>
+                <button id="soundNotice" class="w-12 h-12 rounded-full bg-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-xl border-2 border-orange-200 hover:border-orange-300" onclick="showSoundNotice()" title="Important: Sound Settings">
+                    <i class="fas fa-exclamation text-orange-600"></i>
                 </button>
                 <button id="modeToggle" class="w-12 h-12 rounded-full bg-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-xl" onclick="toggleMode()">
                     <i id="modeIcon" class="fas fa-sun text-yellow-500"></i>
@@ -929,6 +929,13 @@
                 elements.menuToggle.style.background = 'rgba(26, 26, 26, 0.95)';
                 elements.menuToggle.style.borderColor = 'rgba(255, 255, 255, 0.2)';
                 
+                // Update sound notice button for dark mode
+                const soundNoticeBtn = document.getElementById('soundNotice');
+                if (soundNoticeBtn) {
+                    soundNoticeBtn.style.background = 'rgba(251, 146, 60, 0.2)';
+                    soundNoticeBtn.style.borderColor = 'rgba(251, 146, 60, 0.4)';
+                }
+                
                 // Update card backgrounds
                 document.querySelectorAll('.glass-card').forEach(el => {
                     el.style.background = 'rgba(45, 45, 45, 0.9)';
@@ -962,6 +969,13 @@
                 // Restore menu toggle
                 elements.menuToggle.style.background = 'rgba(255, 255, 255, 0.95)';
                 elements.menuToggle.style.borderColor = 'rgba(0, 150, 136, 0.2)';
+                
+                // Restore sound notice button for light mode
+                const soundNoticeBtn = document.getElementById('soundNotice');
+                if (soundNoticeBtn) {
+                    soundNoticeBtn.style.background = '';
+                    soundNoticeBtn.style.borderColor = '';
+                }
                 
                 // Restore card backgrounds
                 document.querySelectorAll('.glass-card').forEach(el => {

@@ -394,6 +394,9 @@
         </div>
     </div>
 
+    <!-- Hidden focus reset button -->
+    <button id="hiddenFocusButton" style="position: absolute; left: -9999px; font-size: 16px;" tabindex="-1"></button>
+    
     <!-- Completion Modal -->
     <div id="completionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="glass-card rounded-xl p-8 max-w-md mx-4 text-center">
@@ -441,32 +444,100 @@
         
         // Mobile menu state
         let isMobileMenuOpen = false;
+        
+        // Detect WeChat browser
+        function isWeChat() {
+            return /micromessenger/i.test(navigator.userAgent);
+        }
+        
+        // Detect iOS
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent);
+        }
 
         // Force zoom out function for mobile browsers
         function forceZoomOut(input) {
             // Blur the input first
             input.blur();
             
-            // Force viewport reset for iOS Safari and WeChat browser
-            setTimeout(() => {
+            // Special handling for WeChat browser
+            if (isWeChat()) {
+                // WeChat specific zoom out method
+                setTimeout(() => {
+                    const hiddenButton = document.getElementById('hiddenFocusButton');
+                    if (hiddenButton) {
+                        // Focus on hidden button to reset zoom
+                        hiddenButton.focus();
+                        setTimeout(() => {
+                            hiddenButton.blur();
+                            document.body.focus();
+                            
+                            // Force multiple viewport resets
+                            const viewport = document.querySelector('meta[name=viewport]');
+                            if (viewport) {
+                                const original = viewport.getAttribute('content');
+                                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=no');
+                                setTimeout(() => {
+                                    viewport.setAttribute('content', original);
+                                }, 50);
+                            }
+                        }, 100);
+                    }
+                }, 50);
+            }
+            
+            // Multiple attempts to force zoom out
+            const forceZoomOutSequence = () => {
+                // Method 1: Viewport manipulation
                 const viewport = document.querySelector('meta[name=viewport]');
                 if (viewport) {
-                    const content = viewport.getAttribute('content');
-                    viewport.setAttribute('content', content + ', user-scalable=no');
+                    const originalContent = viewport.getAttribute('content');
+                    
+                    // Temporarily disable zoom
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                    
                     setTimeout(() => {
-                        viewport.setAttribute('content', content);
+                        // Force scale reset
+                        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                        
+                        setTimeout(() => {
+                            // Restore original settings
+                            viewport.setAttribute('content', originalContent);
+                        }, 200);
                     }, 100);
                 }
                 
-                // Additional method: scroll to force repaint
-                window.scrollTo(0, 0);
-                
-                // Force focus on body to ensure input loses focus
+                // Method 2: Force focus change
                 document.body.focus();
                 
-                // Trigger resize event to force layout recalculation
-                window.dispatchEvent(new Event('resize'));
-            }, 50);
+                // Method 3: Scroll manipulation
+                const currentScrollY = window.scrollY;
+                window.scrollTo(0, 1);
+                setTimeout(() => {
+                    window.scrollTo(0, currentScrollY);
+                }, 10);
+                
+                // Method 4: Force layout recalculation
+                document.body.style.zoom = '1';
+                document.documentElement.style.zoom = '1';
+                
+                // Method 5: Trigger multiple events
+                ['resize', 'orientationchange', 'scroll'].forEach(eventType => {
+                    window.dispatchEvent(new Event(eventType));
+                });
+                
+                // Method 6: Force repaint by changing and restoring a style
+                const originalTransform = document.body.style.transform;
+                document.body.style.transform = 'scale(1)';
+                setTimeout(() => {
+                    document.body.style.transform = originalTransform;
+                }, 50);
+            };
+            
+            // Execute immediately and with delays
+            forceZoomOutSequence();
+            setTimeout(forceZoomOutSequence, 100);
+            setTimeout(forceZoomOutSequence, 300);
         }
 
         // Mobile menu functions

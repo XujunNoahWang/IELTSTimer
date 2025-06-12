@@ -19,6 +19,7 @@
             background: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(0, 150, 136, 0.2);
             transition: all 0.3s ease;
+            font-size: 16px; /* Prevent iOS Safari auto-zoom */
         }
         
         .custom-input:focus {
@@ -603,6 +604,9 @@
                 return;
             }
             
+            // Blur the input to trigger zoom out on iOS Safari
+            input.blur();
+            
             startTimer(minutes, type);
             input.value = '';
         }
@@ -621,6 +625,9 @@
                 alert(`Time cannot exceed ${maxMinutes} minutes`);
                 return;
             }
+            
+            // Blur the input to trigger zoom out on iOS Safari
+            input.blur();
             
             startTimer(minutes, type);
             input.value = '';

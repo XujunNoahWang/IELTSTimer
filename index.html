@@ -967,6 +967,36 @@
             }
         });
 
+        // Pre-train browser to prevent input zoom
+        function preventInputZoom() {
+            // Create a temporary hidden input to "train" the browser
+            const tempInput = document.createElement('input');
+            tempInput.type = 'number';
+            tempInput.style.position = 'absolute';
+            tempInput.style.left = '-9999px';
+            tempInput.style.fontSize = '16px';
+            tempInput.style.opacity = '0';
+            tempInput.style.pointerEvents = 'none';
+            
+            document.body.appendChild(tempInput);
+            
+            // Simulate the zoom-trigger-and-reset cycle
+            setTimeout(() => {
+                tempInput.focus();
+                setTimeout(() => {
+                    // Apply our zoom-out technique to "train" the browser
+                    forceZoomOut(tempInput);
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        if (tempInput.parentNode) {
+                            document.body.removeChild(tempInput);
+                        }
+                    }, 500);
+                }, 100);
+            }, 100);
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             resetTimer();
@@ -977,6 +1007,14 @@
             // Initialize audio on first user interaction
             const initAudioOnInteraction = () => {
                 initializeAudio();
+                
+                // Also train browser to prevent zoom on mobile
+                if (window.innerWidth <= 768 || isIOS() || isWeChat()) {
+                    setTimeout(() => {
+                        preventInputZoom();
+                    }, 100);
+                }
+                
                 // Remove listeners after first interaction
                 document.removeEventListener('touchstart', initAudioOnInteraction);
                 document.removeEventListener('click', initAudioOnInteraction);
@@ -987,6 +1025,28 @@
             document.addEventListener('touchstart', initAudioOnInteraction, { passive: true });
             document.addEventListener('click', initAudioOnInteraction);
             document.addEventListener('keydown', initAudioOnInteraction);
+            
+            // Pre-train browser on mobile devices to prevent input zoom
+            if (window.innerWidth <= 768 || isIOS() || isWeChat()) {
+                // Method 1: Immediate viewport adjustment
+                const viewport = document.querySelector('meta[name=viewport]');
+                if (viewport) {
+                    const originalContent = viewport.getAttribute('content');
+                    
+                    // Temporarily set a stricter viewport
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                    
+                    // Restore after a short delay
+                    setTimeout(() => {
+                        viewport.setAttribute('content', originalContent);
+                    }, 2000);
+                }
+                
+                // Method 2: Train the browser with hidden input
+                setTimeout(() => {
+                    preventInputZoom();
+                }, 1000);
+            }
         });
 
         // Responsive handling

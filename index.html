@@ -449,6 +449,22 @@
         let audioContext = null;
         let isAudioInitialized = false;
         
+
+        
+        // Vibration function for silent mode
+        function vibrateDevice(pattern = [200, 100, 200]) {
+            if (navigator.vibrate) {
+                try {
+                    navigator.vibrate(pattern);
+                    return true;
+                } catch (error) {
+                    console.log('Vibration not supported:', error);
+                    return false;
+                }
+            }
+            return false;
+        }
+        
         // Detect WeChat browser
         function isWeChat() {
             return /micromessenger/i.test(navigator.userAgent);
@@ -838,7 +854,7 @@
         }
 
         // Complete timer
-        function completeTimer() {
+        async function completeTimer() {
             clearInterval(timerState.interval);
             timerState.isRunning = false;
             timerState.remainingTime = 0;
@@ -849,11 +865,55 @@
             elements.completionMessage.textContent = `Congratulations on completing ${timerState.currentType} practice!`;
             elements.completionModal.classList.remove('hidden');
             
-            setTimeout(() => playBeep(800, 200), 0);
-            setTimeout(() => playBeep(1000, 200), 200);
-            setTimeout(() => playBeep(1200, 300), 400);
+            // Check if device is in silent mode
+            const deviceIsSilent = await checkSilentMode();
+            
+            if (deviceIsSilent) {
+                // Use vibration for silent mode (completion only)
+                console.log('Silent mode detected, using vibration');
+                setTimeout(() => vibrateDevice([300, 150, 300, 150, 500]), 0);
+            } else {
+                // Use audio for normal mode
+                setTimeout(() => playBeep(800, 200), 0);
+                setTimeout(() => playBeep(1000, 200), 200);
+                setTimeout(() => playBeep(1200, 300), 400);
+            }
             
             elements.timerTitle.textContent = 'Completed!';
+        }
+        
+        // Simplified silent mode detection
+        async function checkSilentMode() {
+            // For mobile devices, use a simpler approach
+            if (isIOS() || isWeChat()) {
+                // On iOS/WeChat, check if audio context is suspended after user interaction
+                if (audioContext && audioContext.state === 'suspended') {
+                    return true;
+                }
+                
+                // Try to detect based on system volume (approximation)
+                try {
+                    // Create a very brief, quiet test sound
+                    const testOscillator = audioContext.createOscillator();
+                    const testGain = audioContext.createGain();
+                    
+                    testOscillator.connect(testGain);
+                    testGain.connect(audioContext.destination);
+                    
+                    testGain.gain.setValueAtTime(0.001, audioContext.currentTime);
+                    testOscillator.frequency.value = 20000; // Very high frequency, barely audible
+                    
+                    testOscillator.start(audioContext.currentTime);
+                    testOscillator.stop(audioContext.currentTime + 0.001);
+                    
+                    // If we can't create the sound, likely in silent mode
+                    return false;
+                } catch (error) {
+                    return true; // Assume silent mode if error
+                }
+            }
+            
+            return false; // Default to not silent for other devices
         }
 
         // Close modal

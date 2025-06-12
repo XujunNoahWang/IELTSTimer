@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noah's IELTS Timer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom Styles */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 150, 136, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 150, 136, 0.1);
+        }
+        
+        .custom-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 150, 136, 0.2);
+            transition: all 0.3s ease;
+            font-size: 16px !important; /* Prevent iOS Safari auto-zoom */
+            -webkit-text-size-adjust: 100%;
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
+            appearance: none;
+        }
+        
+        /* Additional zoom prevention for all input elements */
+        input[type="number"] {
+            font-size: 16px !important;
+            -webkit-text-size-adjust: 100%;
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
+            appearance: none;
+        }
+        
+        /* Prevent zoom on focus for mobile devices */
+        @media screen and (max-width: 768px) {
+            input[type="number"]:focus {
+                font-size: 16px !important;
+                transform: none !important;
+                zoom: 1 !important;
+            }
+        }
+        
+        .custom-input:focus {
+            outline: none;
+            border-color: #26a69a;
+            box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.1);
+        }
+        
+        .btn-primary {
+            background: #26a69a;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 150, 136, 0.3);
+            background: #00897b;
+        }
+        
+        .progress-bar {
+            background: #26a69a;
+        }
+        
+        .sidebar-panel {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(0, 150, 136, 0.1);
+            box-shadow: 2px 0 20px rgba(0, 150, 136, 0.05);
+            max-height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar-panel::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .sidebar-panel {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .section-title {
+            color: #00695c;
+            font-weight: 600;
+        }
+        
+        .main-title {
+            color: #004d40;
+            font-weight: 700;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        .timer-display-text {
+            color: #333;
+            transition: color 0.3s ease;
+        }
+        
+        #pauseResumeText {
+            transition: opacity 0.3s ease;
+        }
+        
+        .timer-circle-container:hover {
+            transform: scale(1.02);
+            transition: transform 0.2s ease;
+        }
+        
+        /* Mobile overlay styles */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .mobile-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 85%;
+            max-width: 320px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 50;
+        }
+        
+        .mobile-panel.active {
+            transform: translateX(0);
+        }
+        
+        /* Hamburger menu button */
+        .menu-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 60;
+            width: 3rem;
+            height: 3rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 150, 136, 0.2);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .menu-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 150, 136, 0.2);
+        }
+        
+        .menu-toggle i {
+            color: #26a69a;
+            font-size: 1.25rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .menu-toggle.active i {
+            transform: rotate(90deg);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .desktop-sidebar {
+                display: none;
+            }
+            
+            .timer-container {
+                padding: 1rem;
+            }
+            
+            .timer-circle {
+                width: 280px;
+                height: 280px;
+            }
+            
+            .timer-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none;
+            }
+            
+            .mobile-overlay,
+            .mobile-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen overflow-hidden transition-all duration-500" id="mainBody" tabindex="-1">
+    <!-- Mobile Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars" id="menuIcon"></i>
+    </button>
+    
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
+    
+    <div class="flex h-screen">
+        <!-- Desktop Left Control Panel -->
+        <div class="desktop-sidebar w-full md:w-1/3 lg:w-1/4 p-4 sidebar-panel">
+            <h1 class="text-2xl font-bold main-title mb-4 text-center">
+                Noah's IELTS Timer 
+                <span class="text-sm font-normal opacity-60">(updated 2025/6/13)</span>
+            </h1>
+            
+            <!-- Reading Card -->
+            <div class="glass-card rounded-xl p-4 mb-4">
+                <h2 class="text-lg font-semibold section-title mb-3 flex items-center">
+                    <i class="fas fa-book-open mr-2"></i>Reading
+                </h2>
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="btn-primary text-white py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(60, 'Reading')">60 min</button>
+                    <button class="btn-primary text-white py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(20, 'Reading')">20 min</button>
+                    <button class="btn-primary text-white py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(18, 'Reading')">18 min</button>
+                    <button class="btn-primary text-white py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(16, 'Reading')">16 min</button>
+                </div>
+                <div class="mt-3 flex gap-2">
+                    <input type="number" id="readingCustom" placeholder="Custom (min)" max="60" min="1" class="custom-input py-2 px-3 rounded-lg text-sm flex-1">
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startCustomTimer('readingCustom', 'Reading', 60)">Start</button>
+                </div>
+            </div>
+
+            <!-- Writing Card -->
+            <div class="glass-card rounded-xl p-4 mb-4">
+                <h2 class="text-lg font-semibold section-title mb-3 flex items-center">
+                    <i class="fas fa-pen mr-2"></i>Writing
+                </h2>
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(60, 'Writing')">60 min</button>
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(40, 'Writing')">40 min</button>
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(20, 'Writing')">20 min</button>
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(15, 'Writing')">15 min</button>
+                </div>
+                <div class="mt-3 flex gap-2">
+                    <input type="number" id="writingCustom" placeholder="Custom (min)" max="60" min="1" class="custom-input py-2 px-3 rounded-lg text-sm flex-1">
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startCustomTimer('writingCustom', 'Writing', 60)">Start</button>
+                </div>
+            </div>
+
+            <!-- Speaking Card -->
+            <div class="glass-card rounded-xl p-4 mb-4">
+                <h2 class="text-lg font-semibold section-title mb-3 flex items-center">
+                    <i class="fas fa-microphone mr-2"></i>Speaking
+                </h2>
+                <button class="btn-primary py-2 px-4 rounded-lg text-sm font-medium w-full" onclick="startTimer(2, 'Speaking Part 2')">2 min (Part 2)</button>
+            </div>
+
+            <!-- Break Card -->
+            <div class="glass-card rounded-xl p-4 mb-4">
+                <h2 class="text-lg font-semibold section-title mb-3 flex items-center">
+                    <i class="fas fa-coffee mr-2"></i>Break
+                </h2>
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(2, 'Break')">2 min</button>
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(5, 'Break')">5 min</button>
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(10, 'Break')">10 min</button>
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(15, 'Break')">15 min</button>
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(20, 'Break')">20 min</button>
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startTimer(30, 'Break')">30 min</button>
+                </div>
+                <div class="mt-3 flex gap-2">
+                    <input type="number" id="restCustom" placeholder="Custom (min)" min="1" class="custom-input py-2 px-3 rounded-lg text-sm flex-1">
+                    <button class="btn-primary py-2 px-3 rounded-lg text-sm font-medium" onclick="startCustomTimer('restCustom', 'Break')">Start</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Control Panel -->
+        <div class="mobile-panel sidebar-panel" id="mobilePanel">
+            <div class="p-4">
+                <h1 class="text-xl font-bold main-title mb-4 text-center">
+                    Noah's IELTS Timer 
+                    <span class="text-xs font-normal opacity-60 block">(updated 2025/6/12)</span>
+                </h1>
+                
+                <!-- Reading Card -->
+                <div class="glass-card rounded-xl p-3 mb-3">
+                    <h2 class="text-base font-semibold section-title mb-2 flex items-center">
+                        <i class="fas fa-book-open mr-2"></i>Reading
+                    </h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="btn-primary text-white py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(60, 'Reading'); closeMobileMenu();">60 min</button>
+                        <button class="btn-primary text-white py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(20, 'Reading'); closeMobileMenu();">20 min</button>
+                        <button class="btn-primary text-white py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(18, 'Reading'); closeMobileMenu();">18 min</button>
+                        <button class="btn-primary text-white py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(16, 'Reading'); closeMobileMenu();">16 min</button>
+                    </div>
+                    <div class="mt-2 flex gap-2">
+                        <input type="number" id="readingCustomMobile" placeholder="Custom (min)" max="60" min="1" class="custom-input py-2 px-2 rounded-lg text-xs flex-1">
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startCustomTimerMobile('readingCustomMobile', 'Reading', 60)">Start</button>
+                    </div>
+                </div>
+
+                <!-- Writing Card -->
+                <div class="glass-card rounded-xl p-3 mb-3">
+                    <h2 class="text-base font-semibold section-title mb-2 flex items-center">
+                        <i class="fas fa-pen mr-2"></i>Writing
+                    </h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(60, 'Writing'); closeMobileMenu();">60 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(40, 'Writing'); closeMobileMenu();">40 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(20, 'Writing'); closeMobileMenu();">20 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(15, 'Writing'); closeMobileMenu();">15 min</button>
+                    </div>
+                    <div class="mt-2 flex gap-2">
+                        <input type="number" id="writingCustomMobile" placeholder="Custom (min)" max="60" min="1" class="custom-input py-2 px-2 rounded-lg text-xs flex-1">
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startCustomTimerMobile('writingCustomMobile', 'Writing', 60)">Start</button>
+                    </div>
+                </div>
+
+                <!-- Speaking Card -->
+                <div class="glass-card rounded-xl p-3 mb-3">
+                    <h2 class="text-base font-semibold section-title mb-2 flex items-center">
+                        <i class="fas fa-microphone mr-2"></i>Speaking
+                    </h2>
+                    <button class="btn-primary py-2 px-3 rounded-lg text-xs font-medium w-full" onclick="startTimer(2, 'Speaking Part 2'); closeMobileMenu();">2 min (Part 2)</button>
+                </div>
+
+                <!-- Break Card -->
+                <div class="glass-card rounded-xl p-3 mb-3">
+                    <h2 class="text-base font-semibold section-title mb-2 flex items-center">
+                        <i class="fas fa-coffee mr-2"></i>Break
+                    </h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(2, 'Break'); closeMobileMenu();">2 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(5, 'Break'); closeMobileMenu();">5 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(10, 'Break'); closeMobileMenu();">10 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(15, 'Break'); closeMobileMenu();">15 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(20, 'Break'); closeMobileMenu();">20 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(30, 'Break'); closeMobileMenu();">30 min</button>
+                    </div>
+                    <div class="mt-2 flex gap-2">
+                        <input type="number" id="restCustomMobile" placeholder="Custom (min)" min="1" class="custom-input py-2 px-2 rounded-lg text-xs flex-1">
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startCustomTimerMobile('restCustomMobile', 'Break')">Start</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Timer Display -->
+        <div class="flex-1 flex flex-col items-center justify-center timer-container relative">
+            <!-- Day/Night Mode Toggle -->
+            <div class="absolute top-4 right-4 flex gap-2">
+                <button id="soundNotice" class="w-12 h-12 rounded-full bg-orange-100 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-xl border-2 border-orange-200 hover:border-orange-300" onclick="showSoundNotice()" title="Important: Sound Settings">
+                    <i class="fas fa-exclamation text-orange-600"></i>
+                </button>
+                <button id="modeToggle" class="w-12 h-12 rounded-full bg-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-xl" onclick="toggleMode()">
+                    <i id="modeIcon" class="fas fa-sun text-yellow-500"></i>
+                </button>
+            </div>
+            
+            <!-- Timer Status -->
+            <div class="text-center mb-8">
+                <h2 id="timerTitle" class="timer-title text-3xl md:text-4xl font-bold timer-display-text mb-2">Ready to Start</h2>
+            </div>
+
+            <!-- Circular Timer -->
+            <div class="relative mb-8 cursor-pointer timer-circle" id="timerCircleContainer" onclick="toggleTimerByClick()">
+                <svg class="w-70 h-70 md:w-96 md:h-96" viewBox="0 0 200 200">
+                    <!-- Background Circle -->
+                    <circle cx="100" cy="100" r="85" fill="none" stroke="#fafafa" stroke-width="16"/>
+                    <!-- Remaining Time Dynamic Color Circle -->
+                    <circle id="remainingCircle" cx="100" cy="100" r="85" fill="none" stroke="#26a69a" stroke-width="16" 
+                            class="timer-circle" 
+                            stroke-dasharray="534.07" stroke-dashoffset="0"
+                            transform="rotate(-90 100 100)"/>
+                    <!-- Completed Part Light Gray Mask -->
+                    <circle id="completedMask" cx="100" cy="100" r="85" fill="none" stroke="#f8f8f8" stroke-width="16" 
+                            class="timer-circle" 
+                            stroke-dasharray="534.07" stroke-dashoffset="534.07"
+                            transform="rotate(-90 100 100)"/>
+                </svg>
+                <!-- Center Pause/Resume Hint -->
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div id="pauseResumeText" class="text-sm md:text-xl font-medium text-gray-500 opacity-0"></div>
+                </div>
+            </div>
+
+            <!-- Time Information -->
+            <div class="w-full max-w-lg mb-8">
+                <div class="flex justify-between text-base md:text-lg timer-display-text">
+                    <span id="elapsedTime">Elapsed: 00:00</span>
+                    <span id="remainingTime">Remaining: 00:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden focus reset button -->
+    <button id="hiddenFocusButton" style="position: absolute; left: -9999px; font-size: 16px;" tabindex="-1"></button>
+    
+    <!-- Sound Notice Modal -->
+    <div id="soundNoticeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-card rounded-xl p-8 max-w-md mx-4 text-center">
+            <div class="text-6xl mb-4">🔊</div>
+            <h3 class="text-2xl font-bold section-title mb-4">Sound Reminder</h3>
+            <div class="timer-display-text opacity-80 mb-6 text-left">
+                <p class="mb-3">To ensure you receive audio notifications when the timer completes:</p>
+                <ul class="list-disc list-inside space-y-2 text-sm">
+                    <li>Make sure your device volume is turned up</li>
+                    <li>Disable silent/mute mode on your phone</li>
+                    <li>For iOS: Check that the Ring/Silent switch is not on silent</li>
+                    <li>For Android: Ensure media volume is enabled</li>
+                </ul>
+                <p class="mt-4 text-xs opacity-60">💡 Tip: Test the sound by starting and stopping a timer to hear the audio cues.</p>
+            </div>
+            <button class="btn-primary px-6 py-3 rounded-lg font-medium" onclick="closeSoundNotice()">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Completion Modal -->
+    <div id="completionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-card rounded-xl p-8 max-w-md mx-4 text-center">
+            <div class="text-6xl mb-4">🎉</div>
+            <h3 class="text-2xl font-bold section-title mb-2">Time's Up!</h3>
+            <p id="completionMessage" class="timer-display-text opacity-80 mb-6">Congratulations on completing the practice!</p>
+            <button class="btn-primary px-6 py-3 rounded-lg font-medium" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Timer state management
+        let timerState = {
+            isRunning: false,
+            isPaused: false,
+            totalTime: 0,
+            remainingTime: 0,
+            elapsedTime: 0,
+            currentType: '',
+            interval: null,
+            startTime: null
+        };
+
+        // DOM elements
+        const elements = {
+            body: document.getElementById('mainBody'),
+            timerTitle: document.getElementById('timerTitle'),
+            remainingCircle: document.getElementById('remainingCircle'),
+            completedMask: document.getElementById('completedMask'),
+            elapsedTime: document.getElementById('elapsedTime'),
+            remainingTime: document.getElementById('remainingTime'),
+            pauseResumeText: document.getElementById('pauseResumeText'),
+            completionModal: document.getElementById('completionModal'),
+            completionMessage: document.getElementById('completionMessage'),
+            soundNoticeModal: document.getElementById('soundNoticeModal'),
+            modeToggle: document.getElementById('modeToggle'),
+            modeIcon: document.getElementById('modeIcon'),
+            menuToggle: document.getElementById('menuToggle'),
+            menuIcon: document.getElementById('menuIcon'),
+            mobileOverlay: document.getElementById('mobileOverlay'),
+            mobilePanel: document.getElementById('mobilePanel')
+        };
+
+        // Day/Night mode state
+        let isDarkMode = false;
+        
+        // Mobile menu state
+        let isMobileMenuOpen = false;
+        
+        // Audio context for mobile compatibility
+        let audioContext = null;
+        let isAudioInitialized = false;
+        
+
+
+        
+        // Detect WeChat browser
+        function isWeChat() {
+            return /micromessenger/i.test(navigator.userAgent);
+        }
+        
+        // Detect iOS
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent);
+        }
+        
+        // Initialize audio context on first user interaction
+        function initializeAudio() {
+            if (!isAudioInitialized) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Resume audio context if it's suspended (required for mobile)
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+                    
+                    isAudioInitialized = true;
+                    console.log('Audio context initialized');
+                } catch (error) {
+                    console.log('Audio context initialization failed:', error);
+                }
+            }
+        }
+
+        // Force zoom out function for mobile browsers
+        function forceZoomOut(input) {
+            // Blur the input first
+            input.blur();
+            
+            // Special handling for WeChat browser
+            if (isWeChat()) {
+                // WeChat specific zoom out method
+                setTimeout(() => {
+                    const hiddenButton = document.getElementById('hiddenFocusButton');
+                    if (hiddenButton) {
+                        // Focus on hidden button to reset zoom
+                        hiddenButton.focus();
+                        setTimeout(() => {
+                            hiddenButton.blur();
+                            document.body.focus();
+                            
+                            // Force multiple viewport resets
+                            const viewport = document.querySelector('meta[name=viewport]');
+                            if (viewport) {
+                                const original = viewport.getAttribute('content');
+                                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=no');
+                                setTimeout(() => {
+                                    viewport.setAttribute('content', original);
+                                }, 50);
+                            }
+                        }, 100);
+                    }
+                }, 50);
+            }
+            
+            // Multiple attempts to force zoom out
+            const forceZoomOutSequence = () => {
+                // Method 1: Viewport manipulation
+                const viewport = document.querySelector('meta[name=viewport]');
+                if (viewport) {
+                    const originalContent = viewport.getAttribute('content');
+                    
+                    // Temporarily disable zoom
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                    
+                    setTimeout(() => {
+                        // Force scale reset
+                        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                        
+                        setTimeout(() => {
+                            // Restore original settings
+                            viewport.setAttribute('content', originalContent);
+                        }, 200);
+                    }, 100);
+                }
+                
+                // Method 2: Force focus change
+                document.body.focus();
+                
+                // Method 3: Scroll manipulation
+                const currentScrollY = window.scrollY;
+                window.scrollTo(0, 1);
+                setTimeout(() => {
+                    window.scrollTo(0, currentScrollY);
+                }, 10);
+                
+                // Method 4: Force layout recalculation
+                document.body.style.zoom = '1';
+                document.documentElement.style.zoom = '1';
+                
+                // Method 5: Trigger multiple events
+                ['resize', 'orientationchange', 'scroll'].forEach(eventType => {
+                    window.dispatchEvent(new Event(eventType));
+                });
+                
+                // Method 6: Force repaint by changing and restoring a style
+                const originalTransform = document.body.style.transform;
+                document.body.style.transform = 'scale(1)';
+                setTimeout(() => {
+                    document.body.style.transform = originalTransform;
+                }, 50);
+            };
+            
+            // Execute immediately and with delays
+            forceZoomOutSequence();
+            setTimeout(forceZoomOutSequence, 100);
+            setTimeout(forceZoomOutSequence, 300);
+        }
+
+        // Mobile menu functions
+        function toggleMobileMenu() {
+            isMobileMenuOpen = !isMobileMenuOpen;
+            
+            if (isMobileMenuOpen) {
+                elements.mobileOverlay.classList.add('active');
+                elements.mobilePanel.classList.add('active');
+                elements.menuToggle.classList.add('active');
+                elements.menuIcon.className = 'fas fa-times';
+            } else {
+                closeMobileMenu();
+            }
+        }
+        
+        function closeMobileMenu() {
+            isMobileMenuOpen = false;
+            elements.mobileOverlay.classList.remove('active');
+            elements.mobilePanel.classList.remove('active');
+            elements.menuToggle.classList.remove('active');
+            elements.menuIcon.className = 'fas fa-bars';
+        }
+
+        // Audio notification
+        function playBeep(frequency = 800, duration = 200) {
+            try {
+                // Initialize audio if not already done
+                if (!isAudioInitialized) {
+                    initializeAudio();
+                }
+                
+                // Use the global audio context
+                if (audioContext && audioContext.state !== 'closed') {
+                    // Resume if suspended
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+                    
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + duration / 1000);
+                } else {
+                    // Fallback: try to create a new context
+                    const fallbackContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = fallbackContext.createOscillator();
+                    const gainNode = fallbackContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(fallbackContext.destination);
+                    
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, fallbackContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, fallbackContext.currentTime + duration / 1000);
+                    
+                    oscillator.start(fallbackContext.currentTime);
+                    oscillator.stop(fallbackContext.currentTime + duration / 1000);
+                }
+            } catch (error) {
+                console.log('Audio not supported:', error);
+            }
+        }
+
+        // Format time display
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Calculate remaining color based on time ratio
+        function calculateRemainingColor(remainingRatio) {
+            if (remainingRatio > 0.5) {
+                // Green to yellow transition
+                const factor = (remainingRatio - 0.5) * 2;
+                const r = Math.round(255 * (1 - factor) + 38 * factor);
+                const g = Math.round(193 * (1 - factor) + 166 * factor);
+                const b = Math.round(7 * (1 - factor) + 154 * factor);
+                return `rgb(${r}, ${g}, ${b})`;
+            } else {
+                // Yellow to red transition
+                const factor = remainingRatio * 2;
+                const r = Math.round(220 * (1 - factor) + 255 * factor);
+                const g = Math.round(53 * (1 - factor) + 193 * factor);
+                const b = Math.round(69 * (1 - factor) + 7 * factor);
+                return `rgb(${r}, ${g}, ${b})`;
+            }
+        }
+
+        // Update circular progress
+        function updateCircularProgress(progress) {
+            const circumference = 534.07;
+            const completedOffset = circumference * progress;
+            const remainingRatio = 1 - progress;
+            
+            elements.completedMask.style.strokeDashoffset = circumference - completedOffset;
+            elements.remainingCircle.style.stroke = calculateRemainingColor(remainingRatio);
+        }
+
+        // Update display
+        function updateDisplay() {
+            const progress = timerState.elapsedTime / timerState.totalTime;
+            const remainingRatio = 1 - progress;
+            
+            elements.elapsedTime.textContent = `Elapsed: ${formatTime(timerState.elapsedTime)}`;
+            elements.remainingTime.textContent = `Remaining: ${formatTime(timerState.remainingTime)}`;
+            
+            updateCircularProgress(progress);
+            
+            // Get current progress bar color
+            const currentColor = calculateRemainingColor(remainingRatio);
+            
+            // Update pause/resume text
+            if (timerState.isRunning && !timerState.isPaused) {
+                elements.pauseResumeText.textContent = 'Click to Pause';
+                elements.pauseResumeText.style.opacity = '0.7';
+            } else if (timerState.isPaused) {
+                elements.pauseResumeText.textContent = 'Click to Resume';
+                elements.pauseResumeText.style.opacity = '0.9';
+            } else {
+                // Hide text when not started
+                elements.pauseResumeText.textContent = '';
+                elements.pauseResumeText.style.opacity = '0';
+            }
+            
+            // Last 10 seconds audio reminder
+            if (timerState.remainingTime <= 10 && timerState.remainingTime > 0 && timerState.isRunning && !timerState.isPaused) {
+                if (timerState.remainingTime <= 3) {
+                    playBeep(1000, 100);
+                }
+            }
+        }
+
+        // Timer main loop
+        function timerTick() {
+            if (!timerState.isRunning || timerState.isPaused) return;
+            
+            const now = Date.now();
+            timerState.elapsedTime = Math.floor((now - timerState.startTime) / 1000);
+            timerState.remainingTime = Math.max(0, timerState.totalTime - timerState.elapsedTime);
+            
+            updateDisplay();
+            
+            if (timerState.remainingTime <= 0) {
+                completeTimer();
+            }
+        }
+
+        // Start timer
+        function startTimer(minutes, type) {
+            // Initialize audio on user interaction
+            initializeAudio();
+            
+            resetTimer();
+            
+            timerState.totalTime = minutes * 60;
+            timerState.remainingTime = timerState.totalTime;
+            timerState.currentType = type;
+            timerState.isRunning = true;
+            timerState.startTime = Date.now();
+            
+            elements.timerTitle.textContent = `${type} - ${minutes} min`;
+            
+            timerState.interval = setInterval(timerTick, 100);
+            updateDisplay();
+            playBeep(600, 200);
+        }
+
+        // Custom timer
+        function startCustomTimer(inputId, type, maxMinutes = null) {
+            const input = document.getElementById(inputId);
+            const minutes = parseInt(input.value);
+            
+            if (!minutes || minutes <= 0) {
+                alert('Please enter a valid time (minutes)');
+                return;
+            }
+            
+            if (maxMinutes && minutes > maxMinutes) {
+                alert(`Time cannot exceed ${maxMinutes} minutes`);
+                return;
+            }
+            
+            // Force zoom out on mobile browsers
+            forceZoomOut(input);
+            
+            startTimer(minutes, type);
+            input.value = '';
+        }
+        
+        // Custom timer for mobile
+        function startCustomTimerMobile(inputId, type, maxMinutes = null) {
+            const input = document.getElementById(inputId);
+            const minutes = parseInt(input.value);
+            
+            if (!minutes || minutes <= 0) {
+                alert('Please enter a valid time (minutes)');
+                return;
+            }
+            
+            if (maxMinutes && minutes > maxMinutes) {
+                alert(`Time cannot exceed ${maxMinutes} minutes`);
+                return;
+            }
+            
+            // Force zoom out on mobile browsers
+            forceZoomOut(input);
+            
+            startTimer(minutes, type);
+            input.value = '';
+            closeMobileMenu();
+        }
+
+        // Toggle timer by clicking circle
+        function toggleTimerByClick() {
+            if (!timerState.isRunning) return;
+            
+            // Initialize audio on user interaction
+            initializeAudio();
+            
+            if (timerState.isPaused) {
+                // Resume timer
+                timerState.isPaused = false;
+                // Reset start time considering elapsed time
+                timerState.startTime = Date.now() - (timerState.elapsedTime * 1000);
+                timerState.interval = setInterval(timerTick, 100);
+                playBeep(600, 150);
+            } else {
+                // Pause timer
+                timerState.isPaused = true;
+                clearInterval(timerState.interval);
+                playBeep(400, 150);
+            }
+            
+            updateDisplay();
+        }
+
+        // Reset timer
+        function resetTimer() {
+            clearInterval(timerState.interval);
+            
+            timerState = {
+                isRunning: false,
+                isPaused: false,
+                totalTime: 0,
+                remainingTime: 0,
+                elapsedTime: 0,
+                currentType: '',
+                interval: null,
+                startTime: null
+            };
+            
+            elements.timerTitle.textContent = 'Ready to Start';
+            elements.elapsedTime.textContent = 'Elapsed: 00:00';
+            elements.remainingTime.textContent = 'Remaining: 00:00';
+            elements.completedMask.style.strokeDashoffset = '534.07';
+            elements.remainingCircle.style.strokeDashoffset = '0';
+            elements.remainingCircle.style.stroke = '#26a69a';
+            
+            elements.pauseResumeText.textContent = '';
+            elements.pauseResumeText.style.opacity = '0';
+        }
+
+        // Complete timer
+        function completeTimer() {
+            clearInterval(timerState.interval);
+            timerState.isRunning = false;
+            timerState.remainingTime = 0;
+            timerState.elapsedTime = timerState.totalTime;
+            
+            updateDisplay();
+            
+            elements.completionMessage.textContent = `Congratulations on completing ${timerState.currentType} practice!`;
+            elements.completionModal.classList.remove('hidden');
+            
+            // Always use audio notification
+            setTimeout(() => playBeep(800, 200), 0);
+            setTimeout(() => playBeep(1000, 200), 200);
+            setTimeout(() => playBeep(1200, 300), 400);
+            
+            elements.timerTitle.textContent = 'Completed!';
+        }
+        
+
+
+        // Show sound notice function
+        function showSoundNotice() {
+            elements.soundNoticeModal.classList.remove('hidden');
+        }
+        
+        // Close sound notice function
+        function closeSoundNotice() {
+            elements.soundNoticeModal.classList.add('hidden');
+        }
+
+        // Close modal
+        function closeModal() {
+            elements.completionModal.classList.add('hidden');
+            resetTimer();
+        }
+
+        // Toggle day/night mode
+        function toggleMode() {
+            isDarkMode = !isDarkMode;
+            
+            if (isDarkMode) {
+                // Night mode - black theme
+                elements.body.style.background = 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)';
+                elements.modeIcon.className = 'fas fa-moon text-gray-300';
+                elements.modeToggle.style.backgroundColor = '#1a1a1a';
+                
+                // Update text colors
+                document.querySelectorAll('.timer-display-text').forEach(el => {
+                    el.style.color = '#f7fafc';
+                });
+                document.querySelectorAll('.main-title, .section-title').forEach(el => {
+                    el.style.color = '#cbd5e0';
+                });
+                
+                // Update sidebar
+                document.querySelectorAll('.sidebar-panel').forEach(el => {
+                    el.style.background = 'rgba(26, 26, 26, 0.95)';
+                    el.style.borderRight = '1px solid rgba(255, 255, 255, 0.1)';
+                });
+                
+                // Update menu toggle
+                elements.menuToggle.style.background = 'rgba(26, 26, 26, 0.95)';
+                elements.menuToggle.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                
+                // Update sound notice button for dark mode
+                const soundNoticeBtn = document.getElementById('soundNotice');
+                if (soundNoticeBtn) {
+                    soundNoticeBtn.style.background = 'rgba(251, 146, 60, 0.2)';
+                    soundNoticeBtn.style.borderColor = 'rgba(251, 146, 60, 0.4)';
+                }
+                
+                // Update card backgrounds
+                document.querySelectorAll('.glass-card').forEach(el => {
+                    el.style.background = 'rgba(45, 45, 45, 0.9)';
+                    el.style.backdropFilter = 'blur(20px)';
+                    el.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                });
+                
+            } else {
+                // Day mode
+                elements.body.style.background = 'white';
+                elements.modeIcon.className = 'fas fa-sun text-yellow-500';
+                elements.modeToggle.style.backgroundColor = 'white';
+                
+                // Restore original text colors
+                document.querySelectorAll('.timer-display-text').forEach(el => {
+                    el.style.color = '#333';
+                });
+                document.querySelectorAll('.main-title').forEach(el => {
+                    el.style.color = '#004d40';
+                });
+                document.querySelectorAll('.section-title').forEach(el => {
+                    el.style.color = '#00695c';
+                });
+                
+                // Restore sidebar
+                document.querySelectorAll('.sidebar-panel').forEach(el => {
+                    el.style.background = 'rgba(255, 255, 255, 0.98)';
+                    el.style.borderRight = '1px solid rgba(0, 150, 136, 0.1)';
+                });
+                
+                // Restore menu toggle
+                elements.menuToggle.style.background = 'rgba(255, 255, 255, 0.95)';
+                elements.menuToggle.style.borderColor = 'rgba(0, 150, 136, 0.2)';
+                
+                // Restore sound notice button for light mode
+                const soundNoticeBtn = document.getElementById('soundNotice');
+                if (soundNoticeBtn) {
+                    soundNoticeBtn.style.background = '';
+                    soundNoticeBtn.style.borderColor = '';
+                }
+                
+                // Restore card backgrounds
+                document.querySelectorAll('.glass-card').forEach(el => {
+                    el.style.background = '';
+                    el.style.backdropFilter = '';
+                    el.style.border = '';
+                });
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'Space' && timerState.isRunning) {
+                e.preventDefault();
+                toggleTimerByClick();
+            } else if (e.code === 'Escape') {
+                if (!elements.completionModal.classList.contains('hidden')) {
+                    closeModal();
+                } else if (!elements.soundNoticeModal.classList.contains('hidden')) {
+                    closeSoundNotice();
+                } else if (isMobileMenuOpen) {
+                    closeMobileMenu();
+                }
+            }
+        });
+
+        // Page visibility change handling
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && timerState.isRunning && !timerState.isPaused) {
+                // Record time when page is hidden to prevent timing inaccuracy
+                timerState.pausedTime += Date.now() - timerState.startTime - (timerState.elapsedTime * 1000);
+            } else if (!document.hidden && timerState.isRunning && !timerState.isPaused) {
+                // Restart timing when page is visible
+                timerState.startTime = Date.now() - (timerState.elapsedTime * 1000);
+            }
+        });
+
+        // Prevent page refresh when timer is running
+        window.addEventListener('beforeunload', function(e) {
+            if (timerState.isRunning) {
+                e.preventDefault();
+                e.returnValue = 'Timer is running, are you sure you want to leave?';
+                return e.returnValue;
+            }
+        });
+
+
+
+        // Prevent input zoom on all number inputs
+        function setupInputZoomPrevention() {
+            const allNumberInputs = document.querySelectorAll('input[type="number"]');
+            
+            allNumberInputs.forEach(input => {
+                // Set font size to prevent zoom
+                input.style.fontSize = '16px';
+                input.style.webkitTextSizeAdjust = '100%';
+                
+                // Add focus event listener
+                input.addEventListener('focus', function(e) {
+                    // Prevent zoom by temporarily disabling user scaling
+                    const viewport = document.querySelector('meta[name=viewport]');
+                    if (viewport && (isIOS() || isWeChat() || window.innerWidth <= 768)) {
+                        const originalContent = viewport.getAttribute('content');
+                        viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                        
+                        // Restore viewport after input loses focus
+                        const restoreViewport = () => {
+                            viewport.setAttribute('content', originalContent);
+                            input.removeEventListener('blur', restoreViewport);
+                        };
+                        
+                        input.addEventListener('blur', restoreViewport);
+                    }
+                });
+                
+                // Add additional prevention on touchstart
+                input.addEventListener('touchstart', function(e) {
+                    if (isIOS() || isWeChat()) {
+                        // Force font size
+                        this.style.fontSize = '16px';
+                        this.style.webkitTextSizeAdjust = '100%';
+                    }
+                }, { passive: true });
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            resetTimer();
+            
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+            
+            // Setup input zoom prevention
+            setupInputZoomPrevention();
+            
+            // Initialize audio on first user interaction
+            const initAudioOnInteraction = () => {
+                initializeAudio();
+                
+                // Remove listeners after first interaction
+                document.removeEventListener('touchstart', initAudioOnInteraction);
+                document.removeEventListener('click', initAudioOnInteraction);
+                document.removeEventListener('keydown', initAudioOnInteraction);
+            };
+            
+            // Add listeners for various interaction types
+            document.addEventListener('touchstart', initAudioOnInteraction, { passive: true });
+            document.addEventListener('click', initAudioOnInteraction);
+            document.addEventListener('keydown', initAudioOnInteraction);
+        });
+
+        // Responsive handling
+        window.addEventListener('resize', function() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+            
+            // Close mobile menu on resize to desktop
+            if (window.innerWidth > 768 && isMobileMenuOpen) {
+                closeMobileMenu();
+            }
+        });
+    </script>
+</body>
+</html> 

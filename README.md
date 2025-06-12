@@ -33,8 +33,6 @@ Visit the live application: [https://noahs-ielts-timer.vercel.app/](https://noah
 
 ```
 IELTSTimer/
-├── public/
-│   └── index.html          # Main HTML file
 ├── src/
 │   ├── css/
 │   │   └── styles.css      # Custom CSS styles
@@ -42,9 +40,15 @@ IELTSTimer/
 │       └── timer.js        # JavaScript functionality
 ├── assets/
 │   └── audio/              # Audio files (if any)
+├── archive/
+│   └── index-legacy.html   # Original single-file version
+├── public/
+│   └── index.html          # Development version
+├── index.html              # Main HTML file (for deployment)
 ├── package.json            # Project configuration
-├── README.md              # Project documentation
-└── index.html             # Legacy single-file version
+├── vercel.json             # Vercel deployment config
+├── server.py              # Development server
+└── README.md              # Project documentation
 ```
 
 ## 🛠️ Technology Stack

@@ -2,10 +2,10 @@
   "name": "noahs-ielts-timer",
   "version": "1.0.0",
   "description": "A comprehensive timer application for IELTS practice with mobile optimization and audio notifications",
-  "main": "public/index.html",
+  "main": "index.html",
   "scripts": {
-    "start": "python -m http.server 8000 --directory public",
-    "dev": "python -m http.server 8000 --directory public",
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
     "build": "echo 'No build process needed for static files'",
     "test": "echo 'No tests specified'",
     "lint:css": "echo 'CSS linting not configured'",

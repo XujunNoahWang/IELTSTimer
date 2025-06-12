@@ -12,7 +12,7 @@ from pathlib import Path
 
 # Configuration
 PORT = 8000
-DIRECTORY = "public"
+DIRECTORY = "."
 
 class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):

@@ -38,16 +38,11 @@ IELTSTimer/
 │   │   └── styles.css      # Custom CSS styles
 │   └── js/
 │       └── timer.js        # JavaScript functionality
-├── assets/
-│   └── audio/              # Audio files (if any)
 ├── archive/
 │   └── index-legacy.html   # Original single-file version
-├── public/
-│   └── index.html          # Development version
-├── index.html              # Main HTML file (for deployment)
+├── index.html              # Main HTML file
 ├── package.json            # Project configuration
 ├── vercel.json             # Vercel deployment config
-├── server.py              # Development server
 └── README.md              # Project documentation
 ```
 
@@ -78,14 +73,14 @@ IELTSTimer/
    ```bash
    npm start
    # or
-   python -m http.server 8000 --directory public
+   python -m http.server 8000
    ```
 
 3. **Open in browser**
    Navigate to `http://localhost:8000`
 
 ### Alternative Setup
-For a simple setup without a server, you can open `public/index.html` directly in your browser, though some features may require a server environment.
+For a simple setup without a server, you can open `index.html` directly in your browser, though some features may require a server environment.
 
 ## 📱 Usage Guide
 
@@ -110,7 +105,7 @@ For a simple setup without a server, you can open `public/index.html` directly i
 ## 🎨 Customization
 
 ### Modifying Timer Presets
-Edit the timer buttons in `public/index.html`:
+Edit the timer buttons in `index.html`:
 ```html
 <button onclick="startTimer(25, 'Reading')">25 min</button>
 ```

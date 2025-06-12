@@ -50,6 +50,7 @@
             box-shadow: 2px 0 20px rgba(0, 150, 136, 0.05);
             max-height: 100vh;
             overflow-y: auto;
+            transition: transform 0.3s ease;
         }
         
         .sidebar-panel::-webkit-scrollbar {
@@ -93,12 +94,121 @@
             transform: scale(1.02);
             transition: transform 0.2s ease;
         }
+        
+        /* Mobile overlay styles */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .mobile-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 85%;
+            max-width: 320px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 50;
+        }
+        
+        .mobile-panel.active {
+            transform: translateX(0);
+        }
+        
+        /* Hamburger menu button */
+        .menu-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 60;
+            width: 3rem;
+            height: 3rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 150, 136, 0.2);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .menu-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 150, 136, 0.2);
+        }
+        
+        .menu-toggle i {
+            color: #26a69a;
+            font-size: 1.25rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .menu-toggle.active i {
+            transform: rotate(90deg);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .desktop-sidebar {
+                display: none;
+            }
+            
+            .timer-container {
+                padding: 1rem;
+            }
+            
+            .timer-circle {
+                width: 280px;
+                height: 280px;
+            }
+            
+            .timer-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none;
+            }
+            
+            .mobile-overlay,
+            .mobile-panel {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen overflow-hidden transition-all duration-500" id="mainBody">
+    <!-- Mobile Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars" id="menuIcon"></i>
+    </button>
+    
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
+    
     <div class="flex h-screen">
-        <!-- Left Control Panel -->
-        <div class="w-full md:w-1/3 lg:w-1/4 p-4 sidebar-panel">
+        <!-- Desktop Left Control Panel -->
+        <div class="desktop-sidebar w-full md:w-1/3 lg:w-1/4 p-4 sidebar-panel">
             <h1 class="text-2xl font-bold main-title mb-4 text-center">
                 Noah's IELTS Timer 
                 <span class="text-sm font-normal opacity-60">(updated 2025/6/12)</span>
@@ -165,9 +275,80 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Mobile Control Panel -->
+        <div class="mobile-panel sidebar-panel" id="mobilePanel">
+            <div class="p-4">
+                <h1 class="text-xl font-bold main-title mb-4 text-center">
+                    Noah's IELTS Timer 
+                    <span class="text-xs font-normal opacity-60 block">(updated 2025/6/12)</span>
+                </h1>
+                
+                <!-- Reading Card -->
+                <div class="glass-card rounded-xl p-3 mb-3">
+                    <h2 class="text-base font-semibold section-title mb-2 flex items-center">
+                        <i class="fas fa-book-open mr-2"></i>Reading
+                    </h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="btn-primary text-white py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(60, 'Reading'); closeMobileMenu();">60 min</button>
+                        <button class="btn-primary text-white py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(20, 'Reading'); closeMobileMenu();">20 min</button>
+                        <button class="btn-primary text-white py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(18, 'Reading'); closeMobileMenu();">18 min</button>
+                        <button class="btn-primary text-white py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(16, 'Reading'); closeMobileMenu();">16 min</button>
+                    </div>
+                    <div class="mt-2 flex gap-2">
+                        <input type="number" id="readingCustomMobile" placeholder="Custom (min)" max="60" min="1" class="custom-input py-2 px-2 rounded-lg text-xs flex-1">
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startCustomTimerMobile('readingCustomMobile', 'Reading', 60)">Start</button>
+                    </div>
+                </div>
+
+                <!-- Writing Card -->
+                <div class="glass-card rounded-xl p-3 mb-3">
+                    <h2 class="text-base font-semibold section-title mb-2 flex items-center">
+                        <i class="fas fa-pen mr-2"></i>Writing
+                    </h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(60, 'Writing'); closeMobileMenu();">60 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(40, 'Writing'); closeMobileMenu();">40 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(20, 'Writing'); closeMobileMenu();">20 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(15, 'Writing'); closeMobileMenu();">15 min</button>
+                    </div>
+                    <div class="mt-2 flex gap-2">
+                        <input type="number" id="writingCustomMobile" placeholder="Custom (min)" max="60" min="1" class="custom-input py-2 px-2 rounded-lg text-xs flex-1">
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startCustomTimerMobile('writingCustomMobile', 'Writing', 60)">Start</button>
+                    </div>
+                </div>
+
+                <!-- Speaking Card -->
+                <div class="glass-card rounded-xl p-3 mb-3">
+                    <h2 class="text-base font-semibold section-title mb-2 flex items-center">
+                        <i class="fas fa-microphone mr-2"></i>Speaking
+                    </h2>
+                    <button class="btn-primary py-2 px-3 rounded-lg text-xs font-medium w-full" onclick="startTimer(2, 'Speaking Part 2'); closeMobileMenu();">2 min (Part 2)</button>
+                </div>
+
+                <!-- Break Card -->
+                <div class="glass-card rounded-xl p-3 mb-3">
+                    <h2 class="text-base font-semibold section-title mb-2 flex items-center">
+                        <i class="fas fa-coffee mr-2"></i>Break
+                    </h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(2, 'Break'); closeMobileMenu();">2 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(5, 'Break'); closeMobileMenu();">5 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(10, 'Break'); closeMobileMenu();">10 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(15, 'Break'); closeMobileMenu();">15 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(20, 'Break'); closeMobileMenu();">20 min</button>
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startTimer(30, 'Break'); closeMobileMenu();">30 min</button>
+                    </div>
+                    <div class="mt-2 flex gap-2">
+                        <input type="number" id="restCustomMobile" placeholder="Custom (min)" min="1" class="custom-input py-2 px-2 rounded-lg text-xs flex-1">
+                        <button class="btn-primary py-2 px-2 rounded-lg text-xs font-medium" onclick="startCustomTimerMobile('restCustomMobile', 'Break')">Start</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Right Timer Display -->
-        <div class="flex-1 flex flex-col items-center justify-center p-8 relative">
+        <div class="flex-1 flex flex-col items-center justify-center timer-container relative">
             <!-- Day/Night Mode Toggle -->
             <div class="absolute top-4 right-4">
                 <button id="modeToggle" class="w-12 h-12 rounded-full bg-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-xl" onclick="toggleMode()">
@@ -177,12 +358,12 @@
             
             <!-- Timer Status -->
             <div class="text-center mb-8">
-                <h2 id="timerTitle" class="text-3xl md:text-4xl font-bold timer-display-text mb-2">Ready to Start</h2>
+                <h2 id="timerTitle" class="timer-title text-3xl md:text-4xl font-bold timer-display-text mb-2">Ready to Start</h2>
             </div>
 
             <!-- Circular Timer -->
-            <div class="relative mb-8 cursor-pointer" id="timerCircleContainer" onclick="toggleTimerByClick()">
-                <svg class="w-80 h-80 md:w-96 md:h-96" viewBox="0 0 200 200">
+            <div class="relative mb-8 cursor-pointer timer-circle" id="timerCircleContainer" onclick="toggleTimerByClick()">
+                <svg class="w-70 h-70 md:w-96 md:h-96" viewBox="0 0 200 200">
                     <!-- Background Circle -->
                     <circle cx="100" cy="100" r="85" fill="none" stroke="#fafafa" stroke-width="16"/>
                     <!-- Remaining Time Dynamic Color Circle -->
@@ -198,13 +379,13 @@
                 </svg>
                 <!-- Center Pause/Resume Hint -->
                 <div class="absolute inset-0 flex items-center justify-center">
-                    <div id="pauseResumeText" class="text-lg md:text-xl font-medium text-gray-500 opacity-0"></div>
+                    <div id="pauseResumeText" class="text-sm md:text-xl font-medium text-gray-500 opacity-0"></div>
                 </div>
             </div>
 
             <!-- Time Information -->
             <div class="w-full max-w-lg mb-8">
-                <div class="flex justify-between text-lg timer-display-text">
+                <div class="flex justify-between text-base md:text-lg timer-display-text">
                     <span id="elapsedTime">Elapsed: 00:00</span>
                     <span id="remainingTime">Remaining: 00:00</span>
                 </div>
@@ -247,11 +428,40 @@
             completionModal: document.getElementById('completionModal'),
             completionMessage: document.getElementById('completionMessage'),
             modeToggle: document.getElementById('modeToggle'),
-            modeIcon: document.getElementById('modeIcon')
+            modeIcon: document.getElementById('modeIcon'),
+            menuToggle: document.getElementById('menuToggle'),
+            menuIcon: document.getElementById('menuIcon'),
+            mobileOverlay: document.getElementById('mobileOverlay'),
+            mobilePanel: document.getElementById('mobilePanel')
         };
 
         // Day/Night mode state
         let isDarkMode = false;
+        
+        // Mobile menu state
+        let isMobileMenuOpen = false;
+
+        // Mobile menu functions
+        function toggleMobileMenu() {
+            isMobileMenuOpen = !isMobileMenuOpen;
+            
+            if (isMobileMenuOpen) {
+                elements.mobileOverlay.classList.add('active');
+                elements.mobilePanel.classList.add('active');
+                elements.menuToggle.classList.add('active');
+                elements.menuIcon.className = 'fas fa-times';
+            } else {
+                closeMobileMenu();
+            }
+        }
+        
+        function closeMobileMenu() {
+            isMobileMenuOpen = false;
+            elements.mobileOverlay.classList.remove('active');
+            elements.mobilePanel.classList.remove('active');
+            elements.menuToggle.classList.remove('active');
+            elements.menuIcon.className = 'fas fa-bars';
+        }
 
         // Audio notification
         function playBeep(frequency = 800, duration = 200) {
@@ -396,6 +606,26 @@
             startTimer(minutes, type);
             input.value = '';
         }
+        
+        // Custom timer for mobile
+        function startCustomTimerMobile(inputId, type, maxMinutes = null) {
+            const input = document.getElementById(inputId);
+            const minutes = parseInt(input.value);
+            
+            if (!minutes || minutes <= 0) {
+                alert('Please enter a valid time (minutes)');
+                return;
+            }
+            
+            if (maxMinutes && minutes > maxMinutes) {
+                alert(`Time cannot exceed ${maxMinutes} minutes`);
+                return;
+            }
+            
+            startTimer(minutes, type);
+            input.value = '';
+            closeMobileMenu();
+        }
 
         // Toggle timer by clicking circle
         function toggleTimerByClick() {
@@ -488,8 +718,14 @@
                 });
                 
                 // Update sidebar
-                document.querySelector('.sidebar-panel').style.background = 'rgba(26, 26, 26, 0.95)';
-                document.querySelector('.sidebar-panel').style.borderRight = '1px solid rgba(255, 255, 255, 0.1)';
+                document.querySelectorAll('.sidebar-panel').forEach(el => {
+                    el.style.background = 'rgba(26, 26, 26, 0.95)';
+                    el.style.borderRight = '1px solid rgba(255, 255, 255, 0.1)';
+                });
+                
+                // Update menu toggle
+                elements.menuToggle.style.background = 'rgba(26, 26, 26, 0.95)';
+                elements.menuToggle.style.borderColor = 'rgba(255, 255, 255, 0.2)';
                 
                 // Update card backgrounds
                 document.querySelectorAll('.glass-card').forEach(el => {
@@ -516,8 +752,14 @@
                 });
                 
                 // Restore sidebar
-                document.querySelector('.sidebar-panel').style.background = 'rgba(255, 255, 255, 0.98)';
-                document.querySelector('.sidebar-panel').style.borderRight = '1px solid rgba(0, 150, 136, 0.1)';
+                document.querySelectorAll('.sidebar-panel').forEach(el => {
+                    el.style.background = 'rgba(255, 255, 255, 0.98)';
+                    el.style.borderRight = '1px solid rgba(0, 150, 136, 0.1)';
+                });
+                
+                // Restore menu toggle
+                elements.menuToggle.style.background = 'rgba(255, 255, 255, 0.95)';
+                elements.menuToggle.style.borderColor = 'rgba(0, 150, 136, 0.2)';
                 
                 // Restore card backgrounds
                 document.querySelectorAll('.glass-card').forEach(el => {
@@ -536,6 +778,8 @@
             } else if (e.code === 'Escape') {
                 if (!elements.completionModal.classList.contains('hidden')) {
                     closeModal();
+                } else if (isMobileMenuOpen) {
+                    closeMobileMenu();
                 }
             }
         });
@@ -572,6 +816,11 @@
         window.addEventListener('resize', function() {
             const vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
+            
+            // Close mobile menu on resize to desktop
+            if (window.innerWidth > 768 && isMobileMenuOpen) {
+                closeMobileMenu();
+            }
         });
     </script>
 </body>

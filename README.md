@@ -40,11 +40,6 @@ IELTSTimer/
 │   │   └── js/
 │   │       └── timer.js    # JavaScript functionality
 │   └── index.html          # Main HTML file (for deployment)
-├── src/
-│   ├── css/
-│   │   └── styles.css      # Source CSS styles
-│   └── js/
-│       └── timer.js        # Source JavaScript functionality
 ├── archive/
 │   └── index-legacy.html   # Original single-file version
 ├── package.json            # Project configuration
@@ -117,14 +112,14 @@ Edit the timer buttons in `public/index.html`:
 ```
 
 ### Styling Changes
-Modify `src/css/styles.css` to customize:
+Modify `public/src/css/styles.css` to customize:
 - Colors and themes
 - Layout and spacing
 - Animations and transitions
 - Mobile responsiveness
 
 ### Adding Features
-Extend functionality in `src/js/timer.js`:
+Extend functionality in `public/src/js/timer.js`:
 - New timer types
 - Additional audio notifications
 - Enhanced mobile features

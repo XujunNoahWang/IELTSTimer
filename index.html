@@ -352,8 +352,8 @@
         <div class="flex-1 flex flex-col items-center justify-center timer-container relative">
             <!-- Day/Night Mode Toggle -->
             <div class="absolute top-4 right-4 flex gap-2">
-                <button id="testVibration" class="w-12 h-12 rounded-full bg-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-xl md:hidden" onclick="testVibration()" title="Test Vibration">
-                    <i class="fas fa-mobile-alt text-teal-600"></i>
+                <button id="soundNotice" class="w-12 h-12 rounded-full bg-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-xl" onclick="showSoundNotice()" title="Sound Notice">
+                    <i class="fas fa-volume-up text-orange-500"></i>
                 </button>
                 <button id="modeToggle" class="w-12 h-12 rounded-full bg-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-xl" onclick="toggleMode()">
                     <i id="modeIcon" class="fas fa-sun text-yellow-500"></i>
@@ -400,6 +400,25 @@
     <!-- Hidden focus reset button -->
     <button id="hiddenFocusButton" style="position: absolute; left: -9999px; font-size: 16px;" tabindex="-1"></button>
     
+    <!-- Sound Notice Modal -->
+    <div id="soundNoticeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-card rounded-xl p-8 max-w-md mx-4 text-center">
+            <div class="text-6xl mb-4">🔊</div>
+            <h3 class="text-2xl font-bold section-title mb-4">Sound Reminder</h3>
+            <div class="timer-display-text opacity-80 mb-6 text-left">
+                <p class="mb-3">To ensure you receive audio notifications when the timer completes:</p>
+                <ul class="list-disc list-inside space-y-2 text-sm">
+                    <li>Make sure your device volume is turned up</li>
+                    <li>Disable silent/mute mode on your phone</li>
+                    <li>For iOS: Check that the Ring/Silent switch is not on silent</li>
+                    <li>For Android: Ensure media volume is enabled</li>
+                </ul>
+                <p class="mt-4 text-xs opacity-60">💡 Tip: Test the sound by starting and stopping a timer to hear the audio cues.</p>
+            </div>
+            <button class="btn-primary px-6 py-3 rounded-lg font-medium" onclick="closeSoundNotice()">Got it!</button>
+        </div>
+    </div>
+
     <!-- Completion Modal -->
     <div id="completionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="glass-card rounded-xl p-8 max-w-md mx-4 text-center">
@@ -434,6 +453,7 @@
             pauseResumeText: document.getElementById('pauseResumeText'),
             completionModal: document.getElementById('completionModal'),
             completionMessage: document.getElementById('completionMessage'),
+            soundNoticeModal: document.getElementById('soundNoticeModal'),
             modeToggle: document.getElementById('modeToggle'),
             modeIcon: document.getElementById('modeIcon'),
             menuToggle: document.getElementById('menuToggle'),
@@ -453,25 +473,7 @@
         let isAudioInitialized = false;
         
 
-        
-        // Vibration function for silent mode
-        function vibrateDevice(pattern = [200, 100, 200]) {
-            console.log('Attempting to vibrate with pattern:', pattern);
-            
-            if ('vibrate' in navigator) {
-                try {
-                    const result = navigator.vibrate(pattern);
-                    console.log('Vibration result:', result);
-                    return result;
-                } catch (error) {
-                    console.log('Vibration error:', error);
-                    return false;
-                }
-            } else {
-                console.log('Vibration API not supported');
-                return false;
-            }
-        }
+
         
         // Detect WeChat browser
         function isWeChat() {
@@ -862,7 +864,7 @@
         }
 
         // Complete timer
-        async function completeTimer() {
+        function completeTimer() {
             clearInterval(timerState.interval);
             timerState.isRunning = false;
             timerState.remainingTime = 0;
@@ -873,77 +875,24 @@
             elements.completionMessage.textContent = `Congratulations on completing ${timerState.currentType} practice!`;
             elements.completionModal.classList.remove('hidden');
             
-            // Check if device is in silent mode
-            const deviceIsSilent = await checkSilentMode();
-            
-            if (deviceIsSilent) {
-                // Use vibration for silent mode (completion only)
-                console.log('Silent mode detected, using vibration');
-                vibrateDevice([300, 150, 300, 150, 500]);
-            } else {
-                // Use audio for normal mode
-                setTimeout(() => playBeep(800, 200), 0);
-                setTimeout(() => playBeep(1000, 200), 200);
-                setTimeout(() => playBeep(1200, 300), 400);
-            }
-            
-            // For testing: also try vibration on mobile devices regardless of silent mode
-            if (isIOS() || isWeChat() || window.innerWidth <= 768) {
-                console.log('Mobile device detected, testing vibration...');
-                setTimeout(() => {
-                    vibrateDevice([100, 50, 100]);
-                }, 1000);
-            }
+            // Always use audio notification
+            setTimeout(() => playBeep(800, 200), 0);
+            setTimeout(() => playBeep(1000, 200), 200);
+            setTimeout(() => playBeep(1200, 300), 400);
             
             elements.timerTitle.textContent = 'Completed!';
         }
         
-        // Simplified silent mode detection
-        async function checkSilentMode() {
-            console.log('Checking silent mode...');
-            console.log('AudioContext state:', audioContext ? audioContext.state : 'No context');
-            console.log('Is iOS:', isIOS());
-            console.log('Is WeChat:', isWeChat());
-            
-            // For testing purposes, let's always use vibration on mobile devices
-            // You can manually test by putting device in silent mode
-            if (isIOS() || isWeChat() || window.innerWidth <= 768) {
-                // Check if audio context is suspended (indicates silent mode on iOS)
-                if (audioContext && audioContext.state === 'suspended') {
-                    console.log('Silent mode detected: AudioContext suspended');
-                    return true;
-                }
-                
-                // For now, let's add a simple heuristic
-                // If it's mobile and we can't resume audio context, assume silent
-                if (audioContext) {
-                    try {
-                        await audioContext.resume();
-                        if (audioContext.state === 'suspended') {
-                            console.log('Silent mode detected: Cannot resume AudioContext');
-                            return true;
-                        }
-                    } catch (error) {
-                        console.log('Silent mode detected: AudioContext error', error);
-                        return true;
-                    }
-                }
-            }
-            
-            console.log('Normal mode detected');
-            return false; // Default to not silent
-        }
 
-        // Test vibration function
-        function testVibration() {
-            console.log('Testing vibration...');
-            const success = vibrateDevice([200, 100, 200, 100, 200]);
-            
-            if (success) {
-                alert('Vibration test completed! Did you feel it?');
-            } else {
-                alert('Vibration not supported on this device/browser');
-            }
+
+        // Show sound notice function
+        function showSoundNotice() {
+            elements.soundNoticeModal.classList.remove('hidden');
+        }
+        
+        // Close sound notice function
+        function closeSoundNotice() {
+            elements.soundNoticeModal.classList.add('hidden');
         }
 
         // Close modal
@@ -1031,6 +980,8 @@
             } else if (e.code === 'Escape') {
                 if (!elements.completionModal.classList.contains('hidden')) {
                     closeModal();
+                } else if (!elements.soundNoticeModal.classList.contains('hidden')) {
+                    closeSoundNotice();
                 } else if (isMobileMenuOpen) {
                     closeMobileMenu();
                 }

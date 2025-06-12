@@ -29,7 +29,7 @@
   },
   "homepage": "https://noahs-ielts-timer.vercel.app/",
   "engines": {
-    "node": ">=14.0.0"
+    "node": "18.x"
   },
   "browserslist": [
     "> 1%",

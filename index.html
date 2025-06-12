@@ -198,7 +198,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen overflow-hidden transition-all duration-500" id="mainBody">
+<body class="min-h-screen overflow-hidden transition-all duration-500" id="mainBody" tabindex="-1">
     <!-- Mobile Menu Toggle Button -->
     <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()">
         <i class="fas fa-bars" id="menuIcon"></i>
@@ -442,6 +442,33 @@
         // Mobile menu state
         let isMobileMenuOpen = false;
 
+        // Force zoom out function for mobile browsers
+        function forceZoomOut(input) {
+            // Blur the input first
+            input.blur();
+            
+            // Force viewport reset for iOS Safari and WeChat browser
+            setTimeout(() => {
+                const viewport = document.querySelector('meta[name=viewport]');
+                if (viewport) {
+                    const content = viewport.getAttribute('content');
+                    viewport.setAttribute('content', content + ', user-scalable=no');
+                    setTimeout(() => {
+                        viewport.setAttribute('content', content);
+                    }, 100);
+                }
+                
+                // Additional method: scroll to force repaint
+                window.scrollTo(0, 0);
+                
+                // Force focus on body to ensure input loses focus
+                document.body.focus();
+                
+                // Trigger resize event to force layout recalculation
+                window.dispatchEvent(new Event('resize'));
+            }, 50);
+        }
+
         // Mobile menu functions
         function toggleMobileMenu() {
             isMobileMenuOpen = !isMobileMenuOpen;
@@ -604,8 +631,8 @@
                 return;
             }
             
-            // Blur the input to trigger zoom out on iOS Safari
-            input.blur();
+            // Force zoom out on mobile browsers
+            forceZoomOut(input);
             
             startTimer(minutes, type);
             input.value = '';
@@ -626,8 +653,8 @@
                 return;
             }
             
-            // Blur the input to trigger zoom out on iOS Safari
-            input.blur();
+            // Force zoom out on mobile browsers
+            forceZoomOut(input);
             
             startTimer(minutes, type);
             input.value = '';

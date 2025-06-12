@@ -43,6 +43,7 @@ IELTSTimer/
 ├── index.html              # Main HTML file
 ├── package.json            # Project configuration
 ├── vercel.json             # Vercel deployment config
+├── .gitignore              # Git ignore rules
 └── README.md              # Project documentation
 ```
 
